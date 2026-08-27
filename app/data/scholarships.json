@@ -1,0 +1,713 @@
+{
+  "dataset_version": "1.0",
+  "created_for": "Scholarship Guardian MVP",
+  "status": "prototype research dataset",
+  "important_note": "This dataset is a build input, not a final legal/eligibility authority. Re-verify all rules, dates, institution lists, and current-cycle requirements against official sources before public deployment.",
+  "schemes": [
+    {
+      "id": "pm_yasasvi_top_class_college",
+      "name": "PM YASASVI Top Class Education in College",
+      "short_name": "PM YASASVI Top Class College",
+      "authority": "Ministry of Social Justice and Empowerment",
+      "portal": "National Scholarship Portal (NSP)",
+      "target_profile": "OBC/EBC/DNT student pursuing a prescribed full-time course at a notified/eligible institution",
+      "mvp_priority": "HERO",
+      "match_level_logic": {
+        "strong_match": "All deterministic core eligibility rules pass and no high-impact application prerequisite is unresolved.",
+        "possible_match": "No deterministic blocker, but institution/slot or another high-impact condition requires confirmation.",
+        "not_currently_matching": "A deterministic core eligibility rule fails."
+      },
+      "eligibility_rules": [
+        {
+          "id": "py_category",
+          "field": "category",
+          "operator": "IN",
+          "expected_value": [
+            "OBC",
+            "EBC",
+            "DNT"
+          ],
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "What is your social category?",
+          "evidence": [
+            "COMMUNITY_CERTIFICATE"
+          ]
+        },
+        {
+          "id": "py_income",
+          "field": "annual_family_income",
+          "operator": "LTE",
+          "expected_value": 250000,
+          "unit": "INR",
+          "classification": "DOCUMENT_DERIVED",
+          "required_for_eligibility": true,
+          "student_question": "What is your family's approximate annual income?",
+          "evidence": [
+            "INCOME_CERTIFICATE"
+          ]
+        },
+        {
+          "id": "py_course",
+          "field": "course_is_prescribed_full_time",
+          "operator": "EQ",
+          "expected_value": true,
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Are you enrolled in a prescribed full-time course?",
+          "evidence": [
+            "ADMISSION_PROOF"
+          ]
+        },
+        {
+          "id": "py_institution",
+          "field": "institution_currently_notified",
+          "operator": "EQ",
+          "expected_value": true,
+          "classification": "POTENTIAL",
+          "required_for_eligibility": true,
+          "student_question": "Which institution do you attend?",
+          "evidence": [
+            "INSTITUTION_RECORD",
+            "ADMISSION_PROOF"
+          ],
+          "guardian_behavior": "Return ATTENTION when the current-cycle notified institution status cannot be confidently verified."
+        },
+        {
+          "id": "py_slot",
+          "field": "scheme_slot_available",
+          "operator": "EQ",
+          "expected_value": true,
+          "classification": "UNKNOWN",
+          "required_for_eligibility": false,
+          "guardian_behavior": "Do not infer slot availability. Show UNKNOWN/authority-dependent."
+        }
+      ],
+      "documents": [
+        {
+          "type": "COMMUNITY_CERTIFICATE",
+          "required": true
+        },
+        {
+          "type": "INCOME_CERTIFICATE",
+          "required": true
+        },
+        {
+          "type": "ADMISSION_PROOF",
+          "required": true
+        },
+        {
+          "type": "BANK_PROOF",
+          "required": "VERIFY_CURRENT_CYCLE"
+        }
+      ],
+      "guardian_checks": [
+        {
+          "id": "py_g_category",
+          "type": "ELIGIBILITY",
+          "rule": "py_category",
+          "severity": "HIGH"
+        },
+        {
+          "id": "py_g_income",
+          "type": "ELIGIBILITY",
+          "rule": "py_income",
+          "severity": "HIGH"
+        },
+        {
+          "id": "py_g_course",
+          "type": "ELIGIBILITY",
+          "rule": "py_course",
+          "severity": "HIGH"
+        },
+        {
+          "id": "py_g_institution",
+          "type": "INSTITUTION",
+          "rule": "py_institution",
+          "severity": "HIGH"
+        },
+        {
+          "id": "py_g_slot",
+          "type": "SELECTION_OR_CAPACITY",
+          "rule": "py_slot",
+          "severity": "INFO"
+        },
+        {
+          "id": "py_g_name_consistency",
+          "type": "CONSISTENCY",
+          "severity": "MEDIUM"
+        },
+        {
+          "id": "py_g_required_documents",
+          "type": "DOCUMENT_COMPLETENESS",
+          "severity": "HIGH"
+        }
+      ],
+      "verification_stages": [
+        "STUDENT_APPLICATION",
+        "INSTITUTE_VERIFICATION",
+        "HIGHER_LEVEL_VERIFICATION",
+        "SANCTION",
+        "PAYMENT"
+      ],
+      "status_states": [
+        "PREPARING",
+        "SUBMITTED",
+        "DEFECTIVE",
+        "INSTITUTE_VERIFICATION",
+        "HIGHER_LEVEL_VERIFICATION",
+        "SANCTIONED",
+        "PAYMENT",
+        "COMPLETED"
+      ],
+      "current_cycle_deadlines": {
+        "cycle": "2026-27",
+        "student_application": "2026-10-31",
+        "defective_application_verification": "2026-11-15",
+        "institute_verification": "2026-11-15",
+        "higher_level_verification": "2026-11-30",
+        "verification_status": "VERIFY_BEFORE_RELEASE"
+      },
+      "unknowns": [
+        "Current institution notification/slot status",
+        "Final selection outcome",
+        "Authority-side verification decisions",
+        "Payment timing"
+      ],
+      "sources": [
+        {
+          "title": "NSP All Scholarships / 2026-27 listing",
+          "url": "https://scholarships.gov.in/All-Scholarships",
+          "type": "OFFICIAL_NSP"
+        },
+        {
+          "title": "PM YASASVI Top Class Education in College scheme guideline",
+          "url": "https://socialjustice.gov.in/writereaddata/UploadFile/36951702274207.pdf",
+          "type": "OFFICIAL_SCHEME_GUIDELINE"
+        }
+      ]
+    },
+    {
+      "id": "tn_bc_mbc_dnc_central_institutions",
+      "name": "Tamil Nadu BC/MBC/DNC Scholarship for Students in Central Institutions",
+      "short_name": "TN BC/MBC/DNC Central Institution Scholarship",
+      "authority": "Tamil Nadu Backward Classes, Most Backward Classes and Denotified Communities Welfare Department",
+      "portal": "Tamil Nadu welfare/application process",
+      "target_profile": "Tamil Nadu native BC/MBC/DNC student pursuing eligible UG/PG study at IIT/IIM/IIIT/NIT/Central University",
+      "mvp_priority": "HIGH",
+      "eligibility_rules": [
+        {
+          "id": "tn_central_category",
+          "field": "category",
+          "operator": "IN",
+          "expected_value": [
+            "BC",
+            "MBC",
+            "DNC"
+          ],
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "What is your community category?",
+          "evidence": [
+            "COMMUNITY_CERTIFICATE"
+          ]
+        },
+        {
+          "id": "tn_native",
+          "field": "native_state",
+          "operator": "EQ",
+          "expected_value": "Tamil Nadu",
+          "classification": "DOCUMENT_DERIVED",
+          "required_for_eligibility": true,
+          "student_question": "Which state are you a native of?",
+          "evidence": [
+            "NATIVITY_PROOF"
+          ]
+        },
+        {
+          "id": "tn_income",
+          "field": "annual_family_income",
+          "operator": "LTE",
+          "expected_value": 250000,
+          "unit": "INR",
+          "classification": "DOCUMENT_DERIVED",
+          "required_for_eligibility": true,
+          "student_question": "What is your family's approximate annual income?",
+          "evidence": [
+            "INCOME_CERTIFICATE"
+          ]
+        },
+        {
+          "id": "tn_institution",
+          "field": "institution_type",
+          "operator": "IN",
+          "expected_value": [
+            "IIT",
+            "IIM",
+            "IIIT",
+            "NIT",
+            "CENTRAL_UNIVERSITY"
+          ],
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Which institution do you attend?",
+          "evidence": [
+            "INSTITUTION_RECORD",
+            "ADMISSION_PROOF"
+          ]
+        },
+        {
+          "id": "tn_course_level",
+          "field": "study_level",
+          "operator": "IN",
+          "expected_value": [
+            "UG",
+            "PG"
+          ],
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "What level are you studying?",
+          "evidence": [
+            "ADMISSION_PROOF"
+          ]
+        },
+        {
+          "id": "tn_capacity",
+          "field": "available_places",
+          "operator": "UNKNOWN",
+          "expected_value": null,
+          "classification": "UNKNOWN",
+          "required_for_eligibility": false,
+          "guardian_behavior": "Do not promise selection. Explain that applications may be shortlisted if demand exceeds available places."
+        }
+      ],
+      "documents": [
+        {
+          "type": "COMMUNITY_CERTIFICATE",
+          "required": true
+        },
+        {
+          "type": "NATIVITY_PROOF",
+          "required": true
+        },
+        {
+          "type": "INCOME_CERTIFICATE",
+          "required": true
+        },
+        {
+          "type": "ADMISSION_PROOF",
+          "required": true
+        },
+        {
+          "type": "ACADEMIC_MARKS",
+          "required": "VERIFY_CURRENT_CYCLE"
+        }
+      ],
+      "guardian_checks": [
+        {
+          "id": "tn_g_category",
+          "type": "ELIGIBILITY",
+          "rule": "tn_central_category",
+          "severity": "HIGH"
+        },
+        {
+          "id": "tn_g_native",
+          "type": "ELIGIBILITY",
+          "rule": "tn_native",
+          "severity": "HIGH"
+        },
+        {
+          "id": "tn_g_income",
+          "type": "ELIGIBILITY",
+          "rule": "tn_income",
+          "severity": "HIGH"
+        },
+        {
+          "id": "tn_g_institution",
+          "type": "ELIGIBILITY",
+          "rule": "tn_institution",
+          "severity": "HIGH"
+        },
+        {
+          "id": "tn_g_course",
+          "type": "ELIGIBILITY",
+          "rule": "tn_course_level",
+          "severity": "HIGH"
+        },
+        {
+          "id": "tn_g_capacity",
+          "type": "SELECTION_OR_CAPACITY",
+          "rule": "tn_capacity",
+          "severity": "INFO"
+        },
+        {
+          "id": "tn_g_document_completeness",
+          "type": "DOCUMENT_COMPLETENESS",
+          "severity": "HIGH"
+        },
+        {
+          "id": "tn_g_consistency",
+          "type": "CONSISTENCY",
+          "severity": "MEDIUM"
+        }
+      ],
+      "verification_stages": [
+        "APPLICATION",
+        "INSTITUTION_OR_DEPARTMENT_REVIEW",
+        "SELECTION_IF_REQUIRED",
+        "SANCTION",
+        "PAYMENT"
+      ],
+      "status_states": [
+        "PREPARING",
+        "SUBMITTED",
+        "UNDER_REVIEW",
+        "DEFECTIVE_OR_CORRECTION",
+        "SELECTED",
+        "SANCTIONED",
+        "PAYMENT",
+        "COMPLETED"
+      ],
+      "current_cycle_deadlines": {
+        "cycle": "VERIFY_CURRENT_CYCLE",
+        "student_application": "VERIFY_CURRENT_CYCLE",
+        "verification": "VERIFY_CURRENT_CYCLE"
+      },
+      "unknowns": [
+        "Current application mechanism and deadline",
+        "Current available places",
+        "Current shortlisting method and cut-off",
+        "Institution-specific handling",
+        "Payment timeline"
+      ],
+      "sources": [
+        {
+          "title": "Tamil Nadu BC/MBC/DNC Welfare Schemes",
+          "url": "https://www.bcmbcmw.tn.gov.in/welfschemes.htm",
+          "type": "OFFICIAL_TAMIL_NADU_DEPARTMENT"
+        },
+        {
+          "title": "Tamil Nadu scholarship fresh application form",
+          "url": "https://bcmbcmw.tn.gov.in/forms/Scholarship_Fresh_application.pdf",
+          "type": "OFFICIAL_APPLICATION_FORM"
+        }
+      ]
+    },
+    {
+      "id": "pm_usp_central_sector_scholarship",
+      "name": "PM-USP Central Sector Scheme of Scholarship for College and University Students",
+      "short_name": "PM-USP CSSS",
+      "authority": "Ministry of Education",
+      "portal": "National Scholarship Portal (NSP)",
+      "target_profile": "High-performing Class XII student entering regular college/university study, subject to income and other scheme conditions",
+      "mvp_priority": "HIGH",
+      "eligibility_rules": [
+        {
+          "id": "csss_percentile",
+          "field": "class12_percentile_band",
+          "operator": "GTE",
+          "expected_value": 80,
+          "unit": "PERCENTILE_BAND",
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Were you above the 80th percentile among successful candidates in your Class XII board/stream?",
+          "evidence": [
+            "ACADEMIC_MARKS"
+          ]
+        },
+        {
+          "id": "csss_regular_course",
+          "field": "regular_course",
+          "operator": "EQ",
+          "expected_value": true,
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Are you enrolled in a regular degree course?",
+          "evidence": [
+            "ADMISSION_PROOF"
+          ]
+        },
+        {
+          "id": "csss_income",
+          "field": "annual_family_income",
+          "operator": "LTE",
+          "expected_value": 450000,
+          "unit": "INR",
+          "classification": "DOCUMENT_DERIVED",
+          "required_for_eligibility": true,
+          "student_question": "What is your family's approximate annual income?",
+          "evidence": [
+            "INCOME_CERTIFICATE"
+          ]
+        },
+        {
+          "id": "csss_other_benefit",
+          "field": "receives_other_scholarship_or_fee_reimbursement",
+          "operator": "EQ",
+          "expected_value": false,
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Are you receiving another scholarship or fee reimbursement?",
+          "evidence": [
+            "STUDENT_DECLARATION",
+            "APPLICATION_DATA"
+          ]
+        },
+        {
+          "id": "csss_diploma",
+          "field": "is_diploma_student",
+          "operator": "EQ",
+          "expected_value": false,
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Are you enrolled as a diploma student?",
+          "evidence": [
+            "ADMISSION_PROOF"
+          ]
+        },
+        {
+          "id": "csss_drop",
+          "field": "post_class12_drop",
+          "operator": "EQ",
+          "expected_value": false,
+          "classification": "DETERMINISTIC",
+          "required_for_eligibility": true,
+          "student_question": "Did you take a drop after Class XII before entering your current course?",
+          "evidence": [
+            "STUDENT_DECLARATION",
+            "ADMISSION_HISTORY"
+          ]
+        }
+      ],
+      "documents": [
+        {
+          "type": "ACADEMIC_MARKS",
+          "required": true
+        },
+        {
+          "type": "INCOME_CERTIFICATE",
+          "required": true
+        },
+        {
+          "type": "ADMISSION_PROOF",
+          "required": true
+        },
+        {
+          "type": "STUDENT_DECLARATION",
+          "required": true
+        }
+      ],
+      "guardian_checks": [
+        {
+          "id": "csss_g_percentile",
+          "type": "ACADEMIC_ELIGIBILITY",
+          "rule": "csss_percentile",
+          "severity": "HIGH"
+        },
+        {
+          "id": "csss_g_regular",
+          "type": "ELIGIBILITY",
+          "rule": "csss_regular_course",
+          "severity": "HIGH"
+        },
+        {
+          "id": "csss_g_income",
+          "type": "ELIGIBILITY",
+          "rule": "csss_income",
+          "severity": "HIGH"
+        },
+        {
+          "id": "csss_g_other_benefit",
+          "type": "ELIGIBILITY",
+          "rule": "csss_other_benefit",
+          "severity": "HIGH"
+        },
+        {
+          "id": "csss_g_diploma",
+          "type": "ELIGIBILITY",
+          "rule": "csss_diploma",
+          "severity": "HIGH"
+        },
+        {
+          "id": "csss_g_drop",
+          "type": "ELIGIBILITY",
+          "rule": "csss_drop",
+          "severity": "HIGH"
+        },
+        {
+          "id": "csss_g_consistency",
+          "type": "CONSISTENCY",
+          "severity": "MEDIUM"
+        }
+      ],
+      "verification_stages": [
+        "STUDENT_APPLICATION",
+        "INSTITUTE_VERIFICATION",
+        "HIGHER_LEVEL_VERIFICATION",
+        "SANCTION",
+        "PAYMENT"
+      ],
+      "status_states": [
+        "PREPARING",
+        "SUBMITTED",
+        "DEFECTIVE",
+        "INSTITUTE_VERIFICATION",
+        "HIGHER_LEVEL_VERIFICATION",
+        "SANCTIONED",
+        "PAYMENT",
+        "COMPLETED"
+      ],
+      "current_cycle_deadlines": {
+        "cycle": "VERIFY_CURRENT_CYCLE",
+        "student_application": "VERIFY_CURRENT_CYCLE",
+        "verification": "VERIFY_CURRENT_CYCLE"
+      },
+      "unknowns": [
+        "Exact current-cycle percentile implementation details",
+        "Current board/stream cut-off mechanics",
+        "Final selection outcome",
+        "Payment timing"
+      ],
+      "sources": [
+        {
+          "title": "PM-USP CSSS official FAQ",
+          "url": "https://www.education.gov.in/sites/upload_files/mhrd/files/upload_document/FAQs_PM_USP2526.pdf",
+          "type": "OFFICIAL_MINISTRY_DOCUMENT"
+        },
+        {
+          "title": "National Scholarship Portal",
+          "url": "https://scholarships.gov.in/",
+          "type": "OFFICIAL_NSP"
+        }
+      ]
+    }
+  ],
+  "common_document_types": {
+    "COMMUNITY_CERTIFICATE": {
+      "fields": [
+        "name",
+        "category",
+        "certificate_number",
+        "issue_date",
+        "issuing_authority"
+      ]
+    },
+    "INCOME_CERTIFICATE": {
+      "fields": [
+        "name",
+        "annual_income",
+        "issue_date",
+        "issuing_authority",
+        "certificate_number"
+      ]
+    },
+    "NATIVITY_PROOF": {
+      "fields": [
+        "name",
+        "state",
+        "issue_date",
+        "issuing_authority"
+      ]
+    },
+    "ADMISSION_PROOF": {
+      "fields": [
+        "name",
+        "institution",
+        "course",
+        "study_level",
+        "academic_year"
+      ]
+    },
+    "ACADEMIC_MARKS": {
+      "fields": [
+        "name",
+        "board",
+        "year",
+        "stream",
+        "marks",
+        "percentile"
+      ]
+    },
+    "STUDENT_DECLARATION": {
+      "fields": [
+        "other_scholarship_status",
+        "drop_status"
+      ]
+    }
+  },
+  "guardian_result_taxonomy": {
+    "PASS": "Evidence and rule evaluation support the requirement.",
+    "ATTENTION": "Something needs student confirmation, correction, or an external verification.",
+    "BLOCKED": "A deterministic requirement currently fails.",
+    "UNKNOWN": "Guardian cannot reliably determine this from available information.",
+    "NOT_APPLICABLE": "The rule does not apply to this student or scheme path."
+  },
+  "readiness_model": {
+    "application_ready": "No known preventable blocker remains for proceeding to the official application.",
+    "not_ready": "At least one high-impact deterministic blocker or unresolved prerequisite remains.",
+    "selection_uncertainty": "Final selection, capacity, merit, authority verification, or payment must remain outside Guardian's guarantee."
+  },
+  "demo_student": {
+    "id": "demo-arun",
+    "name": "Arun Kumar",
+    "state": "Tamil Nadu",
+    "native_state": "Tamil Nadu",
+    "category": "OBC",
+    "course": "B.Tech",
+    "study_level": "UG",
+    "year": 1,
+    "annual_family_income": 240000,
+    "institution": "IIT Madras",
+    "institution_type": "IIT",
+    "regular_course": true,
+    "is_diploma_student": false,
+    "post_class12_drop": false,
+    "receives_other_scholarship_or_fee_reimbursement": false
+  },
+  "demo_documents": [
+    {
+      "id": "demo-income-001",
+      "type": "INCOME_CERTIFICATE",
+      "name": "ARUN KUMAR",
+      "annual_income": 240000,
+      "synthetic": true
+    },
+    {
+      "id": "demo-community-001",
+      "type": "COMMUNITY_CERTIFICATE",
+      "name": "ARUN KUMAR",
+      "category": "OBC",
+      "synthetic": true
+    },
+    {
+      "id": "demo-admission-001",
+      "type": "ADMISSION_PROOF",
+      "name": "ARUN K.",
+      "institution": "IIT Madras",
+      "course": "B.Tech",
+      "study_level": "UG",
+      "synthetic": true
+    }
+  ],
+  "demo_guardian_findings": [
+    {
+      "id": "demo-name-mismatch",
+      "type": "CONSISTENCY",
+      "status": "ATTENTION",
+      "severity": "MEDIUM",
+      "finding": "Name appears as ARUN KUMAR on one document and ARUN K. on another.",
+      "recommended_action": "Confirm the name that should be used consistently in the application and verify against official records.",
+      "do_not_say": "This will definitely cause rejection."
+    },
+    {
+      "id": "demo-institution-confirmation",
+      "type": "INSTITUTION",
+      "status": "ATTENTION",
+      "severity": "HIGH",
+      "finding": "Current-cycle institution eligibility/notification should be confirmed.",
+      "recommended_action": "Confirm the institution against the current official scheme list.",
+      "do_not_say": "You are guaranteed a scholarship."
+    }
+  ]
+}
+
