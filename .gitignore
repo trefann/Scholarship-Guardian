@@ -2,6 +2,8 @@ node_modules/
 dist/
 .next/
 .vinext/
+.wrangler/
+.vercel/
 .env*
 *.log
 *.tar.gz

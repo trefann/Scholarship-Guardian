@@ -62,17 +62,18 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     reviewStates,
     reviewStateHydrated,
     updateReviewState: (scholarshipId: string, update: Partial<Omit<ApplicationReviewState, 'scholarshipId'>>) => {
-      setReviewStates((current) => ({
-        ...current,
-        [scholarshipId]: {
-          scholarshipId,
-          resolvedFindingIds: [],
-          pendingResolvedFindingIds: [],
-          xrayRunCount: 0,
-          ...current[scholarshipId],
-          ...update,
-        },
-      }));
+      setReviewStates((current) => {
+        const existing = current[scholarshipId];
+        return {
+          ...current,
+          [scholarshipId]: {
+            scholarshipId,
+            resolvedFindingIds: update.resolvedFindingIds ?? existing?.resolvedFindingIds ?? [],
+            pendingResolvedFindingIds: update.pendingResolvedFindingIds ?? existing?.pendingResolvedFindingIds ?? [],
+            xrayRunCount: update.xrayRunCount ?? existing?.xrayRunCount ?? 0,
+          },
+        };
+      });
     },
   }), [profile, reviewStates, reviewStateHydrated]);
   return <AppState.Provider value={value}>{children}</AppState.Provider>;

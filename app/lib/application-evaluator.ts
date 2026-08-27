@@ -61,7 +61,7 @@ export function evaluateConsistencyChecks(
   return definitions.flatMap((definition) => {
     const comparable = documents.filter((document) => definition.documentTypes.includes(document.type) && document[definition.field] !== undefined);
     if (comparable.length < definition.minimumDocuments) return [];
-    const values = comparable.map((document) => normalizedConsistencyValue(document[definition.field]));
+    const values = comparable.map((document) => normalizedConsistencyValue(document[definition.field]!));
     const uniqueValues = [...new Set(values)];
     const mismatch = uniqueValues.length > 1;
     const resolvedByUser = mismatch && resolved.has(definition.id);

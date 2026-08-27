@@ -49,7 +49,7 @@ export type EvidenceDocument = {
   id: string;
   type: string;
   synthetic: boolean;
-  [field: string]: string | number | boolean;
+  [field: string]: string | number | boolean | undefined;
 };
 
 export type CommonDocumentType = {
