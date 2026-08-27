@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import source from '@/app/data/scholarships.json';
 import { useAppState } from '@/app/lib/app-state';
 import { evaluateApplication } from '@/app/lib/application-evaluator';
@@ -15,6 +16,11 @@ const categoryLabels = { ELIGIBILITY: 'Eligibility', EVIDENCE: 'Evidence', DOCUM
 export function XRayView({ id }: { id: string }) {
   const scholarship = dataset.schemes.find((item) => item.id === id);
   const { profile, evidenceDocuments, reviewStates, reviewStateHydrated, updateReviewState } = useAppState();
+  const [showRechecked, setShowRechecked] = useState(false);
+  const recheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (recheckTimer.current) clearTimeout(recheckTimer.current);
+  }, []);
   if (!scholarship) return <main><AppHeader /><section className="inner-page"><h1>Scholarship not found</h1></section></main>;
   if (!reviewStateHydrated) return <main><AppHeader step="xray" /><section className="xray-page"><div className="review-loading" role="status">Loading your saved demo review…</div></section></main>;
   const review = reviewStates[id];
@@ -28,6 +34,9 @@ export function XRayView({ id }: { id: string }) {
   function recheck() {
     const applied = [...new Set([...resolvedFindingIds, ...pendingResolvedFindingIds])];
     updateReviewState(id, { resolvedFindingIds: applied, pendingResolvedFindingIds: [], xrayRunCount: (review?.xrayRunCount ?? 0) + 1 });
+    setShowRechecked(true);
+    if (recheckTimer.current) clearTimeout(recheckTimer.current);
+    recheckTimer.current = setTimeout(() => setShowRechecked(false), 1600);
   }
 
   return (
@@ -36,7 +45,7 @@ export function XRayView({ id }: { id: string }) {
       <section className={`xray-summary ${report.readiness === 'READY_TO_APPLY' ? 'summary-ready' : ''}`} aria-labelledby="xray-heading">
         <div className="xray-summary-copy"><p className="eyebrow">Application X-Ray</p><h1 id="xray-heading">{report.readiness === 'READY_TO_APPLY' ? 'Ready to continue' : 'Almost ready'}</h1><p>{report.readiness === 'READY_TO_APPLY' ? 'Guardian found no known preventable blocker.' : `${report.unresolvedPreventable.length} preventable finding still needs your review.`} Results use Arun’s synthetic profile, prototype rules, and structured demo evidence—not an eligibility score or approval prediction.</p></div>
         <div className="xray-counts" aria-label="Current X-Ray result counts"><XRayCount status="PASS" count={report.counts.PASS} label="passed" /><XRayCount status="REVIEWED" count={report.counts.REVIEWED} label="reviewed by you" /><XRayCount status="ATTENTION" count={report.counts.ATTENTION} label="need attention" /><XRayCount status="BLOCKED" count={report.counts.BLOCKED} label="blocked" /><XRayCount status="UNKNOWN" count={report.counts.UNKNOWN} label="cannot be determined" /></div>
-        <div className="xray-summary-actions"><div><strong>Guardian readiness</strong><span>{report.readiness === 'READY_TO_APPLY' ? 'Ready to continue' : `${report.unresolvedPreventable.length} preventable issue${report.unresolvedPreventable.length === 1 ? ' remains' : 's remain'}`}</span></div><button className="button button-light" type="button" onClick={recheck}>{pendingResolvedFindingIds.length ? 'Re-run X-Ray' : 'Recheck application'} <span aria-hidden="true">↻</span></button></div>
+        <div className="xray-summary-actions"><div><strong>Guardian readiness</strong><span>{report.readiness === 'READY_TO_APPLY' ? 'Ready to continue' : `${report.unresolvedPreventable.length} preventable issue${report.unresolvedPreventable.length === 1 ? ' remains' : 's remain'}`}</span></div><button className="button button-light recheck-button" data-rechecked={showRechecked} type="button" onClick={recheck}><span className="recheck-label" key={showRechecked ? 'rechecked' : 'idle'}>{showRechecked ? 'Rechecked' : pendingResolvedFindingIds.length ? 'Re-run X-Ray' : 'Recheck application'}</span><span aria-hidden="true">{showRechecked ? '✓' : '↻'}</span></button><span className="sr-only" role="status" aria-live="polite">{showRechecked ? 'Application rechecked. Findings are current.' : ''}</span></div>
       </section>
 
       {pendingResolvedFindingIds.length > 0 && <div className="pending-recheck" role="status"><strong>{pendingResolvedFindingIds.length} resolution action waiting.</strong><span>Re-run X-Ray to apply it and recompute every finding.</span></div>}
@@ -44,10 +53,10 @@ export function XRayView({ id }: { id: string }) {
 
       <section className="actionability-grid" aria-label="Preventable and authority-dependent findings"><div className="can-fix"><p className="eyebrow">You can fix before applying</p>{report.unresolvedPreventable.length ? <ul>{report.unresolvedPreventable.map((finding) => <li key={finding.id}><span aria-hidden="true">!</span><div><strong>{finding.title}</strong><small>{finding.recommendedAction}</small>{finding.category === 'DOCUMENT_CONSISTENCY' && <Link href={`/issue/${finding.id}?scholarship=${id}`}>Review finding →</Link>}</div></li>)}</ul> : <p className="empty-action-state">✓ No known preventable findings remain.</p>}</div><div className="cannot-control"><p className="eyebrow">Only the authority can decide</p><ul>{report.authorityDependent.map((finding) => <li key={finding.id}><span aria-hidden="true">?</span><div><strong>{finding.title}</strong><small>{finding.recommendedAction}</small><a href={`#finding-${finding.id.replace(/[^a-z0-9_-]/gi, '-')}`}>View assessment ↓</a></div></li>)}</ul></div></section>
 
-      <FindingGroup title="You can fix before applying" description="Preventable findings to review before the official application." findings={report.unresolvedPreventable} scholarshipId={id} empty="No unresolved preventable findings." />
-      <FindingGroup title="Supported by your evidence" description="PASS checks supported by the available profile information and structured demo evidence." findings={passed} scholarshipId={id} />
+      {report.unresolvedPreventable.length > 0 && <FindingGroup title="You can fix before applying" description="Preventable findings to review before the official application." findings={report.unresolvedPreventable} scholarshipId={id} />}
       <FindingGroup title="Reviewed by you" description="User-reviewed issues that no longer block readiness; the underlying evidence has not been verified or changed." findings={reviewed} scholarshipId={id} />
       <FindingGroup title="Only the authority can decide" description="Authority-dependent ATTENTION and UNKNOWN results are not application errors or failures." findings={report.authorityDependent} scholarshipId={id} />
+      <FindingGroup title="Supported by your evidence" description="PASS checks supported by the available profile information and structured demo evidence." findings={passed} scholarshipId={id} />
 
       <section className={`xray-readiness ${report.readiness === 'READY_TO_APPLY' ? 'is-ready' : ''}`}><div><p className="eyebrow">Application readiness</p><h2>{report.readiness === 'READY_TO_APPLY' ? 'Ready to continue' : 'Not ready yet'}</h2>{report.readiness === 'READY_TO_APPLY' ? <p>No known preventable document issue remains. Authority verification, final selection, sanction, and payment remain outside Guardian’s control.</p> : <p>Resolve the preventable findings above before continuing. Guardian will not mark this ready merely because a button was clicked.</p>}</div>{report.readiness === 'READY_TO_APPLY' ? <Link className="button button-primary" href={`/ready/${id}`}>View official handoff <span aria-hidden="true">→</span></Link> : report.unresolvedPreventable[0]?.category === 'DOCUMENT_CONSISTENCY' ? <Link className="button button-primary" href={`/issue/${report.unresolvedPreventable[0].id}?scholarship=${id}`}>Review issue <span aria-hidden="true">→</span></Link> : <a className="button button-secondary" href="#things-requiring-action">Review issues ↑</a>}</section>
     </section></main>
@@ -55,13 +64,13 @@ export function XRayView({ id }: { id: string }) {
 }
 
 function XRayCount({ status, count, label }: { status: FindingStatus; count: number; label: string }) {
-  return <div className={`xray-count count-${status.toLowerCase()}`}><span aria-hidden="true">{status === 'PASS' || status === 'REVIEWED' ? '✓' : status === 'UNKNOWN' ? '?' : status === 'BLOCKED' ? '×' : '!'}</span><strong>{count}</strong><small>{label}</small></div>;
+  return <div className={`xray-count count-${status.toLowerCase()}`}><span aria-hidden="true">{status === 'PASS' ? '✓' : status === 'REVIEWED' ? '↺' : status === 'UNKNOWN' ? '?' : status === 'BLOCKED' ? '×' : '!'}</span><strong>{count}</strong><small>{label}</small></div>;
 }
 
-function FindingGroup({ title, description, findings, scholarshipId, empty }: { title: string; description: string; findings: XRayFinding[]; scholarshipId: string; empty?: string }) {
+function FindingGroup({ title, description, findings, scholarshipId }: { title: string; description: string; findings: XRayFinding[]; scholarshipId: string }) {
   const sectionId = title === 'You can fix before applying' ? 'things-requiring-action' : undefined;
-  if (!findings.length && !empty) return null;
-  return <section className="finding-group" id={sectionId}><div className="finding-group-heading"><h2>{title}</h2><p>{description}</p></div>{findings.length ? <div className="xray-findings">{findings.map((finding) => <XRayFindingCard key={finding.id} finding={finding} scholarshipId={scholarshipId} />)}</div> : <p className="finding-empty">✓ {empty}</p>}</section>;
+  if (!findings.length) return null;
+  return <section className="finding-group" id={sectionId}><div className="finding-group-heading"><h2>{title}</h2><p>{description}</p></div><div className="xray-findings">{findings.map((finding) => <XRayFindingCard key={finding.id} finding={finding} scholarshipId={scholarshipId} />)}</div></section>;
 }
 
 function XRayFindingCard({ finding, scholarshipId }: { finding: XRayFinding; scholarshipId: string }) {

@@ -17,7 +17,7 @@ export function EvidenceChain({ evaluation, authority, chain }: { evaluation?: R
   };
   return (
     <details className="evidence-chain">
-      <summary><span className="chain-symbol" aria-hidden="true">↳</span><span>Why Guardian reached this result</span><span className="summary-action">View evidence chain</span></summary>
+      <summary><span className="chain-symbol" aria-hidden="true">↳</span><span>Why Guardian reached this result</span><span className="summary-action"><span className="summary-action-view">View evidence chain</span><span className="summary-action-hide">Hide evidence chain</span><span className="chain-chevron" aria-hidden="true">⌄</span></span></summary>
       <ol className="chain-steps">
         <li><span className="chain-index">1</span><div><p className="chain-label">Requirement</p><strong>{normalized.requirement}</strong><small>{normalized.requirementContext}</small></div></li>
         <li><span className="chain-index">2</span><div><p className="chain-label">Your information</p><strong>{normalized.studentValue}</strong><small>{normalized.studentContext}</small>{evaluation?.provenance.basis === 'DEMO_INFERENCE' && <p className="chain-caution">{evaluation.provenance.note}</p>}</div></li>
