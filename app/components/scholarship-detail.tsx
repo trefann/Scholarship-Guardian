@@ -20,7 +20,7 @@ export function ScholarshipDetail({ id }: { id: string }) {
   const evaluation = evaluateScholarship(profile, scholarship, evidenceDocuments);
   const counts = evaluation.results.reduce<Record<string, number>>((current, result) => ({ ...current, [result.status]: (current[result.status] ?? 0) + 1 }), {});
   return (
-    <main><AppHeader step="matches" /><section className="detail-page">
+    <main><AppHeader step="matches" scholarshipId={id} /><section className="detail-page">
       <Link className="back-link" href="/matches">← All matches</Link>
       <div className="detail-hero"><div><div className="scheme-meta"><span>{scholarship.authority}</span><span className="hero-scheme">{matchLabels[evaluation.level]}</span></div><h1>{scholarship.name}</h1><p className="page-lede">{scholarship.target_profile}.</p><p className="honesty-copy">This assessment uses a prototype research dataset, Arun’s synthetic profile, and structured demo evidence. It is not an eligibility guarantee.</p></div><aside className="scheme-overview" aria-label="Scholarship overview"><p className="eyebrow">Scheme overview</p><dl><div><dt>Authority</dt><dd>{scholarship.authority}</dd></div><div><dt>Application system</dt><dd>{scholarship.portal}</dd></div><div><dt>Reference status</dt><dd>Prototype dataset · current cycle must be re-verified</dd></div></dl></aside></div>
 

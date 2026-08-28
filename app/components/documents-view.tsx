@@ -16,7 +16,7 @@ export function DocumentsView({ id }: { id: string }) {
   if (!scholarship) return <main><AppHeader /><section className="inner-page"><h1>Scholarship not found</h1></section></main>;
   const requiredTypes = new Set(scholarship.documents.map((item) => item.type));
   return (
-    <main><AppHeader step="prepare" /><section className="documents-page">
+    <main><AppHeader step="prepare" scholarshipId={id} /><section className="documents-page">
       <Link className="back-link" href={`/preparation/${id}`}>← Preparation checklist</Link>
       <div className="page-heading"><p className="eyebrow">Structured demo evidence</p><h1>See exactly what Guardian can read.</h1><p className="page-lede">These are preloaded synthetic records for Arun Kumar. There is no upload, OCR, authenticity check, or government verification in this prototype.</p></div>
       <div className="document-grid">{evidenceDocuments.map((document) => <article className="evidence-document" key={document.id}><div className="document-topline"><span className="document-icon" aria-hidden="true">▤</span><div><p>{requiredTypes.has(document.type) ? 'Used for this scholarship' : 'Available demo evidence'}</p><h2>{documentTypeLabel(document.type)}</h2></div><span className="synthetic-badge">Synthetic</span></div><dl>{Object.entries(document).filter(([field]) => !['id', 'type', 'synthetic'].includes(field)).map(([field, value]) => <div key={field}><dt>{field.replaceAll('_', ' ')}</dt><dd>{formatValue(value, field === 'annual_income' ? 'annual_family_income' : field)}</dd></div>)}</dl><div className="document-foot"><span>Structured fields supplied by dataset</span><strong>{document.id}</strong></div></article>)}</div>

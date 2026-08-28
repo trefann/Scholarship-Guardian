@@ -14,16 +14,16 @@ export default function Home() {
       <section className="hero shell">
         <div className="hero-copy">
           <p className="eyebrow">Prepare with clarity</p>
-          <h1>Scholarships are complicated. Your next step shouldn’t be.</h1>
+          <h1>Finding a scholarship is only half the problem.</h1>
           <p className="hero-lede">
-            Understand what you may qualify for, which evidence matters, and what
-            to fix before you continue to the official application.
+            Scholarship Guardian helps you understand what fits your situation,
+            prepare the right evidence, and catch preventable problems before you apply.
           </p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/profile">
               Check my scholarships <span aria-hidden="true">→</span>
             </Link>
-            <p>No sign-in needed for this prototype.</p>
+            <p className="hero-tagline">Find the scholarship. X-ray the application. Know what to fix.</p>
           </div>
         </div>
 

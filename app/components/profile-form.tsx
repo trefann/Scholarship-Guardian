@@ -23,7 +23,7 @@ export function ProfileForm() {
       <div className="demo-banner">
         <span className="demo-avatar" aria-hidden="true">AK</span>
         <div><strong>Arun Kumar demo profile</strong><p>All values are synthetic and can be edited.</p></div>
-        <button className="text-button" type="button" onClick={resetToDemo}>Restore demo</button>
+        <button className="text-button" type="button" onClick={resetToDemo}>Reset demo journey</button>
       </div>
 
       <fieldset>

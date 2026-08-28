@@ -127,8 +127,7 @@ export type MatchEvaluation = {
 
 export type ApplicationReviewState = {
   scholarshipId: string;
-  resolvedFindingIds: string[];
-  pendingResolvedFindingIds: string[];
+  reviewedFindingIds: string[];
   xrayRunCount: number;
 };
 
@@ -161,7 +160,7 @@ export type XRayFinding = {
   preventable: boolean;
   blocksReadiness: boolean;
   authorityDependent: boolean;
-  resolvedByUser: boolean;
+  reviewedByUser: boolean;
   evidenceChain: EvidenceChainData;
 };
 
@@ -171,6 +170,15 @@ export type XRayReport = {
   readiness: 'NOT_READY' | 'READY_TO_APPLY';
   unresolvedPreventable: XRayFinding[];
   authorityDependent: XRayFinding[];
+};
+
+export type EvaluationMetadata = {
+  datasetVersion: string;
+  datasetStatus: string;
+  evaluationMode: 'SERVER_RULE_ENGINE';
+  sourceVerification: 'REVERIFY_CURRENT_CYCLE';
+  sourceUrls: string[];
+  evaluatedAt: string;
 };
 
 export type ConsistencyCheckDefinition = {

@@ -33,7 +33,7 @@ function ruleFinding(scholarship: Scholarship, result: ReturnType<typeof evaluat
     preventable,
     blocksReadiness: preventable && (result.status === 'ATTENTION' || result.status === 'BLOCKED'),
     authorityDependent,
-    resolvedByUser: false,
+    reviewedByUser: false,
     evidenceChain: {
       requirement,
       requirementContext: `Reference rule supplied for ${scholarship.authority}`,
@@ -54,27 +54,27 @@ function normalizedConsistencyValue(value: string | number | boolean) {
 
 export function evaluateConsistencyChecks(
   documents: EvidenceDocument[],
-  resolvedFindingIds: string[],
+  reviewedFindingIds: string[],
   definitions: ConsistencyCheckDefinition[] = consistencyChecks,
 ): XRayFinding[] {
-  const resolved = new Set(resolvedFindingIds);
+  const reviewed = new Set(reviewedFindingIds);
   return definitions.flatMap((definition) => {
     const comparable = documents.filter((document) => definition.documentTypes.includes(document.type) && document[definition.field] !== undefined);
     if (comparable.length < definition.minimumDocuments) return [];
     const values = comparable.map((document) => normalizedConsistencyValue(document[definition.field]!));
     const uniqueValues = [...new Set(values)];
     const mismatch = uniqueValues.length > 1;
-    const resolvedByUser = mismatch && resolved.has(definition.id);
-    const status: FindingStatus = mismatch ? resolvedByUser ? 'REVIEWED' : 'ATTENTION' : 'PASS';
+    const reviewedByUser = mismatch && reviewed.has(definition.id);
+    const status: FindingStatus = mismatch ? reviewedByUser ? 'REVIEWED' : 'ATTENTION' : 'PASS';
     const explanation = mismatch
-      ? resolvedByUser
-        ? 'You marked this difference as reviewed. The original name formats remain unchanged in the synthetic documents; Guardian has not corrected or verified any underlying record.'
+      ? reviewedByUser
+        ? 'You reviewed this difference, but the structured values still disagree. Review alone does not correct or verify either document.'
         : definition.explanation
       : `The available documents use the same ${definition.field} format.`;
-    const recommendedAction = mismatch && !resolvedByUser
+    const recommendedAction = mismatch && !reviewedByUser
       ? definition.recommendedAction
       : mismatch
-        ? 'Keep your authoritative record check in mind when completing the official application.'
+        ? 'Correct the synthetic evidence in this demo, then re-run X-Ray. For a real application, correct or clarify the authoritative record.'
         : 'No action is currently suggested for this consistency check.';
 
     return [{
@@ -88,11 +88,11 @@ export function evaluateConsistencyChecks(
       explanation,
       recommendedAction,
       sourceContext: 'Guardian cross-document comparison of structured synthetic evidence. No government or identity system was consulted.',
-      confidenceLabel: resolvedByUser ? 'Reviewed by the user · underlying records unchanged' : mismatch ? 'Exact structured-field mismatch detected' : 'Structured fields use the same format',
-      preventable: mismatch && !resolvedByUser,
-      blocksReadiness: mismatch && !resolvedByUser,
+      confidenceLabel: reviewedByUser ? 'Reviewed by the user · mismatch remains unresolved' : mismatch ? 'Exact structured-field mismatch detected' : 'Structured fields use the same format',
+      preventable: mismatch,
+      blocksReadiness: mismatch,
       authorityDependent: false,
-      resolvedByUser,
+      reviewedByUser,
       evidenceChain: {
         requirement: definition.requirement,
         requirementContext: 'Guardian consistency check · prototype logic, not an official eligibility rule',
@@ -112,14 +112,14 @@ export function evaluateApplication(
   scholarship: Scholarship,
   student: StudentProfile,
   evidence: EvidenceDocument[],
-  resolvedFindingIds: string[],
+  reviewedFindingIds: string[] = [],
 ): XRayReport {
   const ruleFindings = evaluateScholarship(student, scholarship, evidence).results.map((result) => ruleFinding(scholarship, result));
-  const consistencyFindings = evaluateConsistencyChecks(evidence, resolvedFindingIds);
+  const consistencyFindings = evaluateConsistencyChecks(evidence, reviewedFindingIds);
   const findings = [...ruleFindings, ...consistencyFindings];
   const counts: Record<FindingStatus, number> = { PASS: 0, REVIEWED: 0, ATTENTION: 0, BLOCKED: 0, UNKNOWN: 0, NOT_APPLICABLE: 0 };
   findings.forEach((finding) => { counts[finding.status] += 1; });
-  const unresolvedPreventable = findings.filter((finding) => finding.blocksReadiness && (finding.status === 'ATTENTION' || finding.status === 'BLOCKED'));
+  const unresolvedPreventable = findings.filter((finding) => finding.blocksReadiness);
   return {
     findings,
     counts,

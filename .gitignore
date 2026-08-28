@@ -4,6 +4,8 @@ dist/
 .vinext/
 .wrangler/
 .vercel/
+test-results/
+playwright-report/
 .env*
 *.log
 *.tar.gz
